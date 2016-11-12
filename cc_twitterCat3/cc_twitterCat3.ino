@@ -1,6 +1,6 @@
 /*****************************
 Creation Computation: Messaging
-Twitter Cat Toy = you can play w/ bug the cat through twitter. 
+Twitter Wiggler: Twitter Plays With Bug The Cat
 Nadine Lessio and Bijun Chen
 ******************************/
 
@@ -11,7 +11,8 @@ Nadine Lessio and Bijun Chen
   4 = decrease speed
   5 = increase positioning
   6 = decrease positiing
-  7 = close. 
+  7 = close
+  8 = reset
   ****************************/
 
 
@@ -37,7 +38,7 @@ void setup()
   Serial.begin(9600);       // begin serial communication
   Serial.setTimeout(20);    // set the timeout, the default is 1 second which is nuts.
   updateInterval = 10;
-  posLimit = 60;
+  posLimit = 120;
   increment = 2;
 
   servo.attach(9);
@@ -48,13 +49,11 @@ void loop()
 {
   readSerialData();
   
-
   if(isRunning){
     
     Serial.println(updateInterval);
     Serial.println(pos);
     
-
     if((millis() - lastUpdate) > updateInterval)  // time to update
     {
       lastUpdate = millis();
@@ -69,7 +68,7 @@ void loop()
     }
   }else{
     servo.write(90);
-    //servo.detach();  // this always makes it get stuck. Efffffff it. 
+    //servo.detach();  // this always makes it get stuck. So forget it for now. 
 
   }
 
@@ -90,11 +89,12 @@ void readSerialData(){
 
 
 void servoLogic(){
+  // if not running, run it. 
   if(!isRunning && startServo == 2){
-    //servo.attach(9);
     isRunning = true;
   } 
 
+  // servo logic is here rather than in the loop so that it only send the command once. 
   if(isRunning){
     if(startServo == 7){
       isRunning = false;
@@ -131,7 +131,8 @@ void servoLogic(){
       }
       
     } else if(startServo == 8){
-      /// some kinda wind down
+      // wanted this as a wind down, but it kept making the servo get stuck. Going to keep this for now. 
+      // could possibly do something w/ ellapsed millis library. 
       posLimit = 60;
       updateInterval = 10;
     }else{

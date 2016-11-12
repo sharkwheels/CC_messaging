@@ -1,8 +1,11 @@
 #################################
-# Twitter Plays With My Cat
+# Twitter Wiggler: Twitter Plays With Bug The Cat
 # v1.0
 # python3 <--- remember that for print statements!
 # Nadine Lessio and Bijun Chen
+#
+# Some Limitations:
+# --> This only works if your account is public
 #################################
 
 ### IMPORTS  #########################################################################
@@ -57,14 +60,13 @@ class catStream(TwythonStreamer):
 
 	## can be accessed by all methods in the class
 	numberOfReplies = 0												# number of replies
-	topLimit = 5													# setting this to 20 but could be like 100 or 1000 or whatever
+	topLimit = 20													# setting this to 20 but could be like 100 or 1000 
 
 	def on_success(self, data):
 
 		if 'text' in data:
-			#print(data['text'].encode('utf-8')) # why its like this in the documentation I will never know. 
 
-			### get your data as a str
+			## get your data as a str
 			body = data['text']
 			user = data['user']['screen_name']
 
@@ -76,8 +78,7 @@ class catStream(TwythonStreamer):
 				
 				self.numberOfReplies+=1								# update the counter by 1
 
-				if not self.numberOfReplies % 2:
-					## increase position ever other tweet
+				if not self.numberOfReplies % 2:					# update the position every other tweet
 					print("multiple of two:",self.numberOfReplies)
 					ser.write(struct.pack('>B',5))	
 				
@@ -105,31 +106,21 @@ class catStream(TwythonStreamer):
 		## it also puts in some natural high and low movements into the toy
 
 		if self.numberOfReplies >= self.topLimit:
-			self.numberOfReplies = self.topLimit	## keep it high.
-			self.hard_reset()						## start winding it down ?
+			self.numberOfReplies = self.topLimit	# keep it high.
+			self.hard_reset()						# start winding it down ?
 
 		print("!on_success: ", self.numberOfReplies)
-
-	def wind_it_down(self):
-		""" Send a reset settings but keep sweeping """
-		pass
 
 	def hard_reset(self):
 		""" reset everything """
 		ser.write(struct.pack('>B', 8))
 		self.numberOfReplies = 0;			# reset the reply number
 		self.windDownCount = 3				# reset the wind down count 
-		 
-
-	def increase_pos(self):
-		"""For every 3rd tweet, update position """
-		pass
 
 	def on_error(self, status_code, data):
-		print("error_code",status_code)
+		""" Print The Error Code """
+		print("error_code: ",status_code)
 
 
 cStream = catStream(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-cStream.statuses.filter(track="@smolcatbug") #only works if you are public
-
-
+cStream.statuses.filter(track="@smolcatbug")								 # only works if you are public
